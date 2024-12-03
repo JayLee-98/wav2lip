@@ -208,8 +208,10 @@ def main():
 		for i, (img_batch, mel_batch, frames, coords) in enumerate(gen):
 			if i == 0:
 				frame_h, frame_w = full_frames[0].shape[:-1]
-				out = cv2.VideoWriter('../temp/result.avi', 
-								cv2.VideoWriter_fourcc(*'DIVX'), fps, (frame_w, frame_h))
+				print("Frame dimensions:", frame_w, frame_h)
+				print("Output file path:", 'temp/result.avi')
+				out = cv2.VideoWriter('/Users/root1/Documents/Wav2Lip/temp/result.avi', 
+                      cv2.VideoWriter_fourcc(*'MJPG'), fps, (frame_w, frame_h))
 
 			img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
 			mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
@@ -225,6 +227,10 @@ def main():
 				pl = cv2.resize(pl.astype(np.uint8), (x2 - x1, y2 - y1))
 				f[y1:y2, x1:x2] = pl
 				out.write(f)
+
+			if not out.isOpened():
+				print("Failed to open VideoWriter. Check codec, path, or permissions.")
+				raise RuntimeError("Failed to open VideoWriter.")
 
 		out.release()
 
